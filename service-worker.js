@@ -1,12 +1,1 @@
-const TARGET='https://quecomerhoy.github.io/central-que-comer/que-comer-pedidos.html';
-self.addEventListener('install',event=>{self.skipWaiting();});
-self.addEventListener('activate',event=>{
-  event.waitUntil((async()=>{
-    const keys=await caches.keys();
-    await Promise.all(keys.map(k=>caches.delete(k)));
-    await self.clients.claim();
-    const clients=await self.clients.matchAll({type:'window',includeUncontrolled:true});
-    for(const client of clients){try{await client.navigate(TARGET)}catch(e){}}
-    try{await self.registration.unregister()}catch(e){}
-  })());
-});
+const CACHE='que-comer-menu-acceso-v1.19.5';self.addEventListener('install',e=>{self.skipWaiting();e.waitUntil(caches.open(CACHE).then(c=>c.add('./index.html')).catch(()=>{}))});self.addEventListener('activate',e=>e.waitUntil((async()=>{for(const k of await caches.keys())if(k!==CACHE)await caches.delete(k);await self.clients.claim()})()));self.addEventListener('fetch',e=>{if(e.request.method!=='GET')return;e.respondWith(fetch(e.request,{cache:'no-store'}).catch(()=>caches.match(e.request,{ignoreSearch:true})))})
